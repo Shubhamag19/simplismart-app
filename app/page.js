@@ -19,7 +19,7 @@ export default function Home() {
           `${process.env.NEXT_PUBLIC_URL}/model-spaces`
         );
         // const res = await axios.get(
-        //   `/api/proxy/model-spaces`
+        //   `/api/model-spaces`
         // );
         // console.log(res)
         if (res.status !== 200) {
