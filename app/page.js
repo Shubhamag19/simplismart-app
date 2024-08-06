@@ -18,6 +18,9 @@ export default function Home() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_URL}/model-spaces`
         );
+        // const res = await axios.get(
+        //   `/api/proxy/model-spaces`
+        // );
         // console.log(res)
         if (res.status !== 200) {
           throw new Error("Error in network request");
