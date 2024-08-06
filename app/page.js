@@ -15,12 +15,12 @@ export default function Home() {
   useEffect(() => {
     const fetchModels = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_URL}/model-spaces`
-        );
         // const res = await axios.get(
-        //   `/api/model-spaces`
+        //   `${process.env.NEXT_PUBLIC_URL}/model-spaces`
         // );
+        const res = await axios.get(
+          `/api/model-spaces`
+        );
         // console.log(res)
         if (res.status !== 200) {
           throw new Error("Error in network request");

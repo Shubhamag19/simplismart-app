@@ -20,8 +20,11 @@ const ModelDetails = ({ params }) => {
   useEffect(() => {
     const fetchModels = async () => {
       try {
+        // const res = await axios.get(
+        //   `${process.env.NEXT_PUBLIC_URL}/model-spaces/${modelId}`
+        // );
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_URL}/model-spaces/${modelId}`
+          `/api/model-spaces/${modelId}`
         );
         // console.log(res)
         if (res.status !== 200) {
@@ -97,7 +100,7 @@ const ModelDetails = ({ params }) => {
       });
   
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_URL}/model-spaces/${modelId}/predict`,
+        `/api/model-spaces/${modelId}/predict`,
         formData,
         {
           headers: {
