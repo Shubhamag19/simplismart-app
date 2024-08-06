@@ -23,19 +23,17 @@ const ModelDetails = ({ params }) => {
         // const res = await axios.get(
         //   `${process.env.NEXT_PUBLIC_URL}/model-spaces/${modelId}`
         // );
-        const res = await axios.get(
-          `/api/model-spaces/${modelId}`
-        );
+        const res = await axios.get(`/api/model-spaces/${modelId}`);
         // console.log(res)
         if (res.status !== 200) {
           throw new Error("Error in network request");
         }
-        console.log(res.data.data);
+        // console.log(res.data.data);
         setModelsData(res.data.data);
         setModelsInput(res.data.data.inputs);
         setModelsOutput(res.data.data.outputs);
       } catch (err) {
-        console.log("in catch bl");
+        // console.log("in catch bl");
         setError(err.message);
       } finally {
         setLoading(false);
@@ -75,52 +73,41 @@ const ModelDetails = ({ params }) => {
   };
 
   const handlePredict = async () => {
-    console.log("userInputs");
-    console.log(userInputs);
-  
+    // console.log("userInputs");
+    // console.log(userInputs);
+
     const inputErrors = {};
     modelsInput.forEach((input) => {
       if (input.required && !userInputs[input.name]) {
         inputErrors[input.name] = "This is a required field";
       }
     });
-  
+
     if (Object.keys(inputErrors).length > 0) {
       setInputErrors(inputErrors);
       return;
     }
 
-    console.log('calling api backedn')
-  
     setLoading(true);
     try {
-      const formData = new FormData();
-      Object.keys(userInputs).forEach((key) => {
-        formData.append(key, userInputs[key]);
-      });
-  
       const res = await axios.post(
         `/api/model-spaces/${modelId}/predict`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        userInputs
       );
       console.log(res);
-      if (res.status !== 200) {
-        throw new Error("Error in network request");
-      }
+      // if (res.status !== 200) {
+      //   throw new Error("Error in network request");
+      // }
       setUserOutputData(res?.data?.data);
+      setOutputErrors(null);
     } catch (err) {
-      console.log("in catch block");
-      setOutputErrors(err.message);
+      // console.log("in catch block");
+      // console.log(err.response.data);
+      setOutputErrors(`Error: ${err.response?.data?.detail[0]?.msg}`);
     } finally {
       setLoading(false);
     }
   };
-  
 
   // audio
   const [isRecording, setIsRecording] = useState(false);
@@ -194,7 +181,7 @@ const ModelDetails = ({ params }) => {
         <div className="spinner-container">
           <div className="spinner"></div>
         </div>
-      ) :
+      ) : (
         <div className="mx-auto mt-[5vh] w-[90%]">
           <h1 className="font-bold text-3xl cursor-pointer underline">
             <Link href="/">Model space</Link>
@@ -230,7 +217,9 @@ const ModelDetails = ({ params }) => {
                           (type: {type[0].toUpperCase()}
                           {type.slice(1)})
                         </span>{" "}
-                        {input.required && <span className="text-red-500">*</span>}
+                        {input.required && (
+                          <span className="text-red-500">*</span>
+                        )}
                       </p>
                       {type !== "audio" && type !== "image" && (
                         <>
@@ -260,11 +249,17 @@ const ModelDetails = ({ params }) => {
                                   : handleStartRecording
                               }
                             >
-                              {isRecording ? "Stop Recording" : "Start Recording"}
+                              {isRecording
+                                ? "Stop Recording"
+                                : "Start Recording"}
                             </button>
                           )}
                           {!isRecording && !uploadedAudioURL && audioURL && (
-                            <audio className="mb-[10px]" controls src={audioURL} />
+                            <audio
+                              className="mb-[10px]"
+                              controls
+                              src={audioURL}
+                            />
                           )}
                           {!(uploadedAudioURL || audioURL) && <p>OR</p>}
                           {!audioURL && (
@@ -350,27 +345,33 @@ const ModelDetails = ({ params }) => {
                       <p className="font-light text-gray-500 text-sm mt-[5px]">
                         {description}
                       </p>
-                      {!outputErrors ? <p className="font-semibold border-2 px-[10px] py-[15px] mt-[15px]">
-                        {userOutputData[name] ?? (
-                          <span className="font-light text-gray-500 text-sm">
-                            Output will be shown here once the prediction is made
-                          </span>
-                        )}
-                      </p> : <p className="font-semibold border-2 px-[10px] py-[15px] mt-[15px]">
-                        {userOutputData[name] ?? (
-                          <span className="font-semibold text-red-500 text-sm">
-                            Something went wrong!!
-                          </span>
-                        )}
-                      </p>}
+                      {!outputErrors ? (
+                        <p className="font-semibold border-2 px-[10px] py-[15px] mt-[15px]">
+                          {userOutputData[name] ?? (
+                            <span className="font-light text-gray-500 text-sm">
+                              Output will be shown here once the prediction is
+                              made
+                            </span>
+                          )}
+                        </p>
+                      ) : (
+                        <p className="font-semibold border-2 px-[10px] py-[15px] mt-[15px]">
+                          {userOutputData[name] ?? (
+                            <span className="font-semibold text-red-500 text-sm">
+                              {outputErrors ?? "Something went wrong!!"}
+                            </span>
+                          )}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
           </div>
-        </div>}
-      </>
+        </div>
+      )}
+    </>
   );
 };
 
